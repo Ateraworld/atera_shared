@@ -1,0 +1,1 @@
+## Atera shared library
