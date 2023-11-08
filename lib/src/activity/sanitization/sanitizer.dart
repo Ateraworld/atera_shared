@@ -1,7 +1,8 @@
 import "dart:convert";
 import "dart:io";
 
-import "package:atera_shared/src/common/extensions.dart";
+import "package:atera_shared/src/common/extensions/directory_extensions.dart";
+import "package:atera_shared/src/common/extensions/string_extensions.dart";
 import "package:omnimodel/omnimodel.dart";
 import "package:path/path.dart";
 
@@ -44,7 +45,7 @@ Future<SanitizationResult> sanitizeActivityFolder(
   for (final f in subElems) {
     var currentDir = Directory(f.path);
     if (currentDir.existsSync()) {
-      res.folderSize = (await currentDir.size()) / 1024;
+      res.folderSize = (await currentDir.sizeKb()) / 1024;
       if (basename(currentDir.path) == "storage") {
         for (final a in currentDir.listSync()) {
           var size = File(a.path).statSync().size / 1024;

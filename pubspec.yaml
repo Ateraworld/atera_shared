@@ -6,8 +6,11 @@ environment:
   sdk: ^3.1.5
 
 dependencies:
+  intl: ^0.18.1
   omnimodel: ^1.1.2
   path: ^1.8.3
+  quiver: ^3.2.1
+  vector_math: ^2.1.4
 
 dev_dependencies:
-  lints: ^2.0.0
+  lints: ^3.0.0
