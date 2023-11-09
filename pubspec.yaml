@@ -9,6 +9,7 @@ dependencies:
   intl: ^0.18.1
   omnimodel: ^1.1.2
   path: ^1.8.3
+  point_in_polygon: ^1.0.0
   quiver: ^3.2.1
   vector_math: ^2.1.4
 
