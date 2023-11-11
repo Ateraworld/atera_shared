@@ -1,3 +1,5 @@
+import "dart:math" as math;
+
 import "package:omnimodel/omnimodel.dart";
 import "package:point_in_polygon/point_in_polygon.dart";
 
@@ -24,7 +26,7 @@ List<(String, OmniModel)> getLocationRegions(OmniModel locationModel, List<Strin
 ///
 /// At the moment is limited in Italy (IT) only.
 Future<OmniModel> locatePoint({
-  required Point p,
+  required math.Point<double> p,
   required OmniModel provincesGeoJson,
   required OmniModel regionsGeoJson,
   required OmniModel zonesGeoJson,
@@ -38,7 +40,7 @@ Future<OmniModel> locatePoint({
   return location;
 }
 
-String? _getLocationFromModel(OmniModel model, Point p, List<Point> points) {
+String? _getLocationFromModel(OmniModel model, math.Point<double> p, List<Point> points) {
   for (final zone in model.tokenOr("features", [])) {
     points.clear();
     var model = OmniModel.fromDynamic(zone);
@@ -46,7 +48,7 @@ String? _getLocationFromModel(OmniModel model, Point p, List<Point> points) {
     for (final coordArr in coords) {
       points.addAll(List.generate(coordArr.length, (index) => Point(x: coordArr[index][0], y: coordArr[index][1])));
     }
-    if (Poly.isPointInPolygon(p, points)) {
+    if (Poly.isPointInPolygon(Point(x: p.x, y: p.y), points)) {
       return model.tokenOrNull("properties.name");
     }
   }
