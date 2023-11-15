@@ -1,6 +1,7 @@
 library;
 
-export "src/activity/sanitization/sanitizer.dart";
+export "src/activity/parametrizer.dart";
+export "src/activity/sanitizer.dart";
 export "src/common/extensions/datetime_extensions.dart";
 export "src/common/extensions/directory_extensions.dart";
 export "src/common/extensions/list_extensions.dart";
