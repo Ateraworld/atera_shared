@@ -7,6 +7,7 @@ environment:
 
 dependencies:
   intl: ^0.18.1
+  latlong2: ^0.9.0
   omnimodel: ^1.1.2
   path: ^1.8.3
   point_in_polygon: ^1.0.0
