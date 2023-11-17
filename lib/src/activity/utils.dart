@@ -10,6 +10,8 @@ List<(OmniModel activity, double distance)> getCloseActivities({
   var longitude = activity.tokenOrNull<num>("attestation.longitude")?.toDouble();
   if (latitude == null || longitude == null) return [];
   var point = LatLng(latitude, longitude);
+  var id = activity.tokenOr("id", "");
+  activities.removeWhere((element) => element.tokenOr("id", "") == id);
   return getActivitiesInRange(point: point, activities: activities, rangeInKm: rangeInKm);
 }
 
