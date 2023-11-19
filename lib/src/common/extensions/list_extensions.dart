@@ -1,7 +1,9 @@
-extension ListExtensions<T> on List<T> {
+import "package:quiver/collection.dart";
+
+extension IteableExtensions<T> on Iterable<T> {
   T? firstWhereOrNull(bool Function(T elem) predicate) {
-    var index = indexWhere(predicate);
-    return index < 0 ? null : this[index];
+    var index = indexOf(this, predicate);
+    return index < 0 ? null : elementAt(index);
   }
 }
 

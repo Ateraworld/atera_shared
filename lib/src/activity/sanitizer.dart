@@ -253,8 +253,14 @@ String _formatActivityString(String source) {
 
 String _formatActivityRelationSection(String sectionSource) {
   sectionSource = _formatActivityString(sectionSource);
-  sectionSource = sectionSource.replaceAll(RegExp("/\bcai\b/gi"), "CAI");
-  sectionSource = sectionSource.replaceAll(RegExp("/\bsat\b/gi"), "SAT");
+  sectionSource = sectionSource.replaceAllMapped(
+    RegExp(r"\b(cai|sat)[ ]?([0-9]+)?", caseSensitive: false),
+    (match) {
+      var number = match.group(2);
+      if (number == null) return "${match.group(1)?.toUpperCase() ?? ""} ";
+      return "${match.group(1)?.toUpperCase() ?? ""} ${match.group(2)}";
+    },
+  );
   return sectionSource;
 }
 
