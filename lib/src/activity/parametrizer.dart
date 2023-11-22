@@ -78,8 +78,8 @@ double _readInsightDuration({
   required (double, double) bounds,
 }) {
   var res = insight.toLowerCase().replaceAll("h", "").split(":");
-  var hours = res[0];
-  var minutes = res.length > 1 ? res[1] : "0";
+  var hours = res[0].trim();
+  var minutes = res.length > 1 ? res[1].trim() : "0";
   var val = double.parse("$hours.${(100 * num.parse(minutes) / 60).round()}").clamp(bounds.$1, bounds.$2);
   return (val - bounds.$1) / (bounds.$2 - bounds.$1);
 }
@@ -89,7 +89,7 @@ double _readInsightToken({
   required String toRemove,
   (double, double)? bounds,
 }) {
-  var res = insight.toLowerCase().replaceAll(toRemove.toLowerCase(), "");
+  var res = insight.toLowerCase().replaceAll(toRemove.toLowerCase(), "").trim();
   var val = double.parse(res);
   if (bounds != null) {
     val = val.clamp(bounds.$1, bounds.$2);

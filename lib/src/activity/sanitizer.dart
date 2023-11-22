@@ -1,8 +1,7 @@
 import "dart:convert";
 import "dart:io";
 
-import "package:atera_shared/src/common/extensions/directory_extensions.dart";
-import "package:atera_shared/src/common/extensions/string_extensions.dart";
+import "package:atera_shared/atera_shared.dart";
 import "package:omnimodel/omnimodel.dart";
 import "package:path/path.dart";
 
@@ -32,6 +31,7 @@ class SanitizationResult {
 /// Returns the result of the sanitarization.
 Future<SanitizationResult> sanitizeActivityFolder(
   String folder, {
+  OmniModel? modelOverride,
   List<OmniModel>? existingActivities,
   OmniModel? definitions,
   int warningSizeKB = 900,
@@ -42,25 +42,35 @@ Future<SanitizationResult> sanitizeActivityFolder(
   var subElems = Directory(folder).listSync();
   var index = subElems.indexWhere((element) => extension(element.path) == ".json");
   var res = SanitizationResult(folder);
+  var file = File(subElems.elementAt(index).path);
+  var model = modelOverride ?? OmniModel.fromDynamic(jsonDecode(await file.readAsString()));
+  var images = model.tokenAsModel("images");
+  var posterFile = basename(model.tokenOr("poster.url", ""));
+
   for (final f in subElems) {
     var currentDir = Directory(f.path);
-    if (currentDir.existsSync()) {
-      res.folderSize = (await currentDir.sizeKb()) / 1024;
-      if (basename(currentDir.path) == "storage") {
-        for (final a in currentDir.listSync()) {
-          var size = File(a.path).statSync().size / 1024;
-          if (size > (res.maxFileSize)) {
-            res.maxFileSize = size;
-          }
-          if (size > warningSizeKB) {
-            res.warnings.add("${basename(a.path)} asset is ${size.toStringAsFixed(2)} KB");
-          }
-        }
+    if (!currentDir.existsSync()) continue;
+    res.folderSize = (await currentDir.sizeKb()) / 1024;
+    if (basename(currentDir.path) != "storage") continue;
+    var storageElems = currentDir.listSync();
+    if (!storageElems.any((element) => basenameWithoutExtension(posterFile) == basenameWithoutExtension(element.path))) {
+      res.errors.add("poster is referencing an unexistent asset");
+    }
+    for (final img in images.entries) {
+      if (!storageElems.any((element) => basenameWithoutExtension(OmniModel.fromDynamic(img.value).tokenOr("url", "")) == basenameWithoutExtension(element.path))) {
+        res.errors.add("image ${img.key} is referencing an unexistent asset");
+      }
+    }
+    for (final a in storageElems) {
+      var size = File(a.path).statSync().size / 1024;
+      if (size > (res.maxFileSize)) {
+        res.maxFileSize = size;
+      }
+      if (size > warningSizeKB) {
+        res.warnings.add("${basename(a.path)} asset is ${size.toStringAsFixed(2)} KB");
       }
     }
   }
-  var file = File(subElems.elementAt(index).path);
-  var model = OmniModel.fromDynamic(jsonDecode(await file.readAsString()));
 
   model = sanitizeActivityModel(
     model: model,
@@ -113,10 +123,57 @@ OmniModel sanitizeActivityModel({
   var points = model.tokenAsModel("location.points").entries.toList();
   var category = model.tokenOrNull<String>("category");
 
+  var imgUrlRegExp = RegExp(r"activities\/[a-z0-9-]*\/[a-z0-9]*\.(webp)", caseSensitive: false);
+
+  //* poster and images
+  if (model.tokenAsModel("poster").isEmpty) {
+    result.errors.add("poster image is missing");
+  } else {
+    if (!imgUrlRegExp.hasMatch(model.tokenOr("poster.url", ""))) {
+      result.errors.add("poster url not formatted correctly");
+    }
+    var type = model.tokenOr("poster.type", "");
+    var types = ["storage", "web", "local"];
+    if (!types.contains(type)) {
+      result.errors.add("poster unsupported poster type $type");
+    }
+  }
+  //* activities links
+  var links = model.tokenAsModel("activities_links").entries;
+  if (existingActivities != null) {
+    for (final l in links) {
+      if (!existingActivities.any((element) => element.tokenOr("id", "") == l.key)) {
+        result.errors.add("linked activity ${l.key} does not exist");
+      }
+    }
+  }
+
   //* name, description, sections and insights format
   model = model.copyWith({
     "name": model.tokenOr("name", "").capitalized(),
     "description": _formatActivityString(model.tokenOr("description", "")).capitalized(),
+    "images": OmniModel.fromEntries(
+      model.tokenAsModel("images").entries.map((img) {
+        var imgModel = OmniModel.fromDynamic(img.value);
+        imgModel.edit({"title": imgModel.tokenOr("title", "").capitalized()});
+        if (!imgUrlRegExp.hasMatch(imgModel.tokenOr("url", ""))) {
+          result!.errors.add("${img.key} url not formatted correctly");
+        }
+        var type = imgModel.tokenOr("type", "");
+        var types = ["storage", "web", "local"];
+        if (!types.contains(type)) {
+          result!.errors.add("${img.key} unsupported poster type $type");
+        }
+        return MapEntry(img.key, imgModel.json);
+      }),
+    ).json,
+    "location.points": OmniModel.fromEntries(
+      model.tokenAsModel("location.points").entries.map((point) {
+        var pointModel = OmniModel.fromDynamic(point.value);
+        pointModel.edit({"description": pointModel.tokenOr("description", "").capitalized()});
+        return MapEntry(point.key, pointModel.json);
+      }),
+    ).json,
     "relation.sections": OmniModel.fromEntries(
       model.tokenAsModel("relation.sections").entries.map((section) {
         var sectionModel = OmniModel.fromDynamic(section.value);
