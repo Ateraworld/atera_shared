@@ -36,12 +36,13 @@ Future<SanitizationResult> sanitizeActivityFolder(
   OmniModel? definitions,
   int warningSizeKB = 900,
 }) async {
+  var res = SanitizationResult(folder);
   if (!validateActivityFolder(folder)) {
-    return SanitizationResult(folder)..errors.add("activity folder is not valid");
+    res.errors.add("activity folder is not valid, json model or storage folder missing");
+    if (modelOverride == null) return res;
   }
   var subElems = Directory(folder).listSync();
   var index = subElems.indexWhere((element) => extension(element.path) == ".json");
-  var res = SanitizationResult(folder);
   var file = File(subElems.elementAt(index).path);
   var model = modelOverride ?? OmniModel.fromDynamic(jsonDecode(await file.readAsString()));
   var images = model.tokenAsModel("images");
