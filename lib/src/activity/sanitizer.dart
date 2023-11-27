@@ -283,14 +283,14 @@ OmniModel sanitizeActivityModel({
     var storedTags = definitions.tokenAsModel("tags").entries.toList();
     for (final t in model.tokenAsModel("tags").entries) {
       if (storedTags.indexWhere((element) => element.key == t.key) < 0) {
-        result.errors.add("$t tag does not exist");
+        result.errors.add("${t.key} tag does not exist");
       }
     }
     var categoryMetrics = definitions.tokenAsModel("metrics.${model.tokenOr("category", "")}");
     var modelMetrics = model.tokenAsModel("metrics");
     for (final m in categoryMetrics.entries) {
       if (!modelMetrics.json.keys.contains(m.key)) {
-        result.errors.add("$m metric does not exist");
+        result.errors.add("${m.key} metric does not exist");
       }
     }
   }
