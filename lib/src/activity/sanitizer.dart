@@ -35,6 +35,7 @@ Future<SanitizationResult> sanitizeActivityFolder(
   List<OmniModel>? existingActivities,
   OmniModel? definitions,
   int warningSizeKB = 900,
+  bool checkAssetsExtensions = true,
 }) async {
   var res = SanitizationResult(folder);
   if (!validateActivityFolder(folder)) {
@@ -54,11 +55,20 @@ Future<SanitizationResult> sanitizeActivityFolder(
     res.folderSize = (await currentDir.sizeKb()) / 1024;
     if (basename(currentDir.path) != "storage") continue;
     var storageElems = currentDir.listSync();
-    if (!storageElems.any((element) => basenameWithoutExtension(posterFile) == basenameWithoutExtension(element.path))) {
+    if (checkAssetsExtensions && storageElems.any((element) => extension(element.path) != ".webp")) {
+      res.warnings.add("storage folder contains non webp asets, they will be ignored");
+    }
+    if (!storageElems.any(
+      (element) => checkAssetsExtensions ? basename(posterFile) == basename(element.path) : basenameWithoutExtension(posterFile) == basenameWithoutExtension(element.path),
+    )) {
       res.errors.add("poster is referencing an unexistent asset");
     }
     for (final img in images.entries) {
-      if (!storageElems.any((element) => basenameWithoutExtension(OmniModel.fromDynamic(img.value).tokenOr("url", "")) == basenameWithoutExtension(element.path))) {
+      if (!storageElems.any(
+        (element) => checkAssetsExtensions
+            ? basename(OmniModel.fromDynamic(img.value).tokenOr("url", "")) == basename(element.path)
+            : basenameWithoutExtension(OmniModel.fromDynamic(img.value).tokenOr("url", "")) == basenameWithoutExtension(element.path),
+      )) {
         res.errors.add("image ${img.key} is referencing an unexistent asset");
       }
     }
