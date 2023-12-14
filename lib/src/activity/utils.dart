@@ -23,6 +23,19 @@ class AttestationPeriod {
     r"^(?<startd>0?[1-9]|[12][0-9]|3[01])\-(?<startm>0?[1-9]|1[0-2])\/(?<endd>0?[1-9]|[12][0-9]|3[01])\-(?<endm>0?[1-9]|1[0-2])$",
   );
 
+  String getActivityFolderName(String activityName) => removeDiacritics(activityName.replaceAll(" ", "_").toLowerCase());
+
+  String removeDiacritics(String str) {
+    var withDia = "ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž";
+    var withoutDia = "AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz";
+
+    for (int i = 0; i < withDia.length; i++) {
+      str = str.replaceAll(withDia[i], withoutDia[i]);
+    }
+
+    return str;
+  }
+
   final int startDay;
   final int startMonth;
   final int endDay;
