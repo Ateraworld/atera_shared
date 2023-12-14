@@ -23,7 +23,7 @@ class AttestationPeriod {
     r"^(?<startd>0?[1-9]|[12][0-9]|3[01])\-(?<startm>0?[1-9]|1[0-2])\/(?<endd>0?[1-9]|[12][0-9]|3[01])\-(?<endm>0?[1-9]|1[0-2])$",
   );
 
-  String getActivityFolderName(String activityName) => removeDiacritics(activityName.replaceAll(" ", "_").toLowerCase());
+  String getActivityFolderName(String activityName) => removeDiacritics(activityName.toLowerCase().trim().replaceAll(RegExp("[ ]{1,}"), "_"));
 
   String removeDiacritics(String str) {
     var withDia = "ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž";
