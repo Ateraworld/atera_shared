@@ -1,6 +1,19 @@
 import "package:latlong2/latlong.dart";
 import "package:omnimodel/omnimodel.dart";
 
+String getActivityFolderName(String activityName) => removeDiacritics(activityName.toLowerCase().trim().replaceAll(RegExp("[ ]{1,}"), "_"));
+
+String removeDiacritics(String str) {
+  var withDia = "ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž";
+  var withoutDia = "AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz";
+
+  for (int i = 0; i < withDia.length; i++) {
+    str = str.replaceAll(withDia[i], withoutDia[i]);
+  }
+
+  return str;
+}
+
 /// Handles the attestation period string and parsing
 class AttestationPeriod {
   AttestationPeriod._(this.startDay, this.startMonth, this.endDay, this.endMonth);
@@ -22,19 +35,6 @@ class AttestationPeriod {
   static final RegExp _regExp = RegExp(
     r"^(?<startd>0?[1-9]|[12][0-9]|3[01])\-(?<startm>0?[1-9]|1[0-2])\/(?<endd>0?[1-9]|[12][0-9]|3[01])\-(?<endm>0?[1-9]|1[0-2])$",
   );
-
-  String getActivityFolderName(String activityName) => removeDiacritics(activityName.toLowerCase().trim().replaceAll(RegExp("[ ]{1,}"), "_"));
-
-  String removeDiacritics(String str) {
-    var withDia = "ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž";
-    var withoutDia = "AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz";
-
-    for (int i = 0; i < withDia.length; i++) {
-      str = str.replaceAll(withDia[i], withoutDia[i]);
-    }
-
-    return str;
-  }
 
   final int startDay;
   final int startMonth;
