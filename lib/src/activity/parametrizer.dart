@@ -3,6 +3,7 @@ import "dart:math";
 import "package:atera_shared/atera_shared.dart";
 import "package:omnimodel/omnimodel.dart";
 
+/// Adjust the tokens and rank reward of the activity based on its metrics
 void adjustRewards(OmniModel model) {
   var minTokens = 60;
   var minRank = 6;
@@ -38,6 +39,7 @@ void adjustRewards(OmniModel model) {
   model.edit({"attestation.tokens": tokens, "attestation.rank": rank});
 }
 
+/// Adjust the activity metrics based on its insights
 void adjustMetrics(OmniModel model) {
   switch (model.tokenOrNull("category")) {
     case "0":

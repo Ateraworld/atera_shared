@@ -18,6 +18,19 @@ extension StringExtensions on String {
     return "${this[0].toUpperCase()}$suffix";
   }
 
+  String asActivityFolderName() => toLowerCase().trim().replaceAll(RegExp("[ ]{1,}"), "_").withoutDiacritics();
+
+  /// Remove all diacritics accents from the string
+  String withoutDiacritics() {
+    var withDia = "ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž";
+    var withoutDia = "AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz";
+    var str = this;
+    for (int i = 0; i < withDia.length; i++) {
+      str = str.replaceAll(withDia[i], withoutDia[i]);
+    }
+    return str;
+  }
+
   /// Attempt to convert a country code to its corresponding flag. Returns empty string on error
   String toFlagEmoji() {
     try {

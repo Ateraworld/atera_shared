@@ -2,12 +2,11 @@ import "dart:convert";
 import "dart:io";
 
 import "package:atera_shared/atera_shared.dart";
+import "package:atera_shared/src/activity/attestation_period.dart";
 import "package:omnimodel/omnimodel.dart";
 import "package:path/path.dart";
 
-RegExp markedTextRegExp = RegExp(r"\$\{\[(?<text>.+?(?=]))\](?<id>[a-zA-z0-9]+)\((?<payload>.*?(?=\)))\)\}");
-
-RegExp attestationPeriodRegExp = RegExp(r"^(?<startd>0?[1-9]|[12][0-9]|3[01])-(?<startm>0?[1-9]|1[0-2])/(?<endd>0?[1-9]|[12][0-9]|3[01])-(?<endm>0?[1-9]|1[0-2])$");
+final RegExp markedTextRegExp = RegExp(r"\$\{\[(?<text>.+?(?=]))\](?<id>[a-zA-z0-9]+)\((?<payload>.*?(?=\)))\)\}");
 
 class SanitizationResult {
   SanitizationResult(this.subject) {
@@ -263,7 +262,7 @@ OmniModel sanitizeActivityModel({
     }
     if (attestation.tokenOr("enabled", true)) {
       var entry = attestation.tokenOrNull<String>("period");
-      if (!(entry == null || entry.isEmpty || attestationPeriodRegExp.hasMatch(entry))) {
+      if (!(entry == null || entry.isEmpty || AttestationPeriod.hasMatch(entry))) {
         result.errors.add("attestation period not formatted");
       }
       if (attestation.tokenOr<num>("tokens", 0) <= 0) {
