@@ -31,6 +31,8 @@ extension StringExtensions on String {
     return str;
   }
 
+  String withExtension(String extension) => "${substring(0, lastIndexOf("."))}.$extension";
+
   /// Attempt to convert a country code to its corresponding flag. Returns empty string on error
   String toFlagEmoji() {
     try {

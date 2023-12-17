@@ -2,7 +2,6 @@ import "dart:convert";
 import "dart:io";
 
 import "package:atera_shared/atera_shared.dart";
-import "package:atera_shared/src/activity/attestation_period.dart";
 import "package:omnimodel/omnimodel.dart";
 import "package:path/path.dart";
 
