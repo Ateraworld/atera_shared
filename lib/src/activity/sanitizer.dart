@@ -132,7 +132,7 @@ OmniModel sanitizeActivityModel({
   var points = model.tokenAsModel("location.points").entries.toList();
   var category = model.tokenOrNull<String>("category");
 
-  var imgUrlRegExp = RegExp(r"activities\/[a-z0-9-]*\/[a-z0-9_]*\.(webp)", caseSensitive: false);
+  var imgUrlRegExp = RegExp(r"activities\/[a-z0-9-]*\/[a-z0-9_]*\.(webp|jpeg|jpg|png)", caseSensitive: false);
 
   //* poster and images
   if (model.tokenAsModel("poster").isEmpty) {
