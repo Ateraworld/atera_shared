@@ -12,7 +12,7 @@ class SanitizationResult {
     errors = List.empty(growable: true);
     warnings = List.empty(growable: true);
     maxFileSize = 0;
-    maxFileSize = 0;
+    folderSize = 0;
   }
   bool get success => errors.isEmpty;
   late List<String> errors;
