@@ -1,6 +1,6 @@
 name: atera_shared
 description: Atera shared library
-version: 1.0.0
+version: 1.1.0
 
 environment:
     sdk: ^3.1.5

@@ -11,22 +11,37 @@ class SanitizationResult {
   SanitizationResult(this.subject) {
     errors = List.empty(growable: true);
     warnings = List.empty(growable: true);
+    sanitizedModel = OmniModel.empty();
     maxFileSize = 0;
     folderSize = 0;
   }
+
   bool get success => errors.isEmpty;
+
+  final String subject;
+  late OmniModel sanitizedModel;
+
   late List<String> errors;
   late List<String> warnings;
   late double maxFileSize;
-  String subject;
   late double folderSize;
 }
 
 /// Sanitize an activity folder.
-/// The folder must be located in the local file system and the [folder] param must be an absolute path to it.
-/// The [existingActivities] should be a list of all the existing activities. The parameter is used to validate existing links to other activities.
 ///
-/// Returns the result of the sanitarization.
+/// The folder must be located in the local file system and the [folder] param must be an absolute path to it.
+///
+/// - [modelOverride]: sanitize the provided model. If not provided, read the model from the folder.
+///
+/// - [existingActivities]: list of all the existing activities. Used to validate existing links to other activities.
+///
+/// - [definitions]: the model of the common definitions. Used to check categories, tags, metrics and more.
+///
+/// - [warningSizeKB]: the size in KB at which a warning is triggered.
+///
+/// - [checkAssetsExtensions]: whether to check that the assets are in the *.webp* format.
+///
+/// Returns the result of the sanitization.
 Future<SanitizationResult> sanitizeActivityFolder(
   String folder, {
   OmniModel? modelOverride,
@@ -81,7 +96,7 @@ Future<SanitizationResult> sanitizeActivityFolder(
     }
   }
 
-  model = sanitizeActivityModel(
+  res = sanitizeActivityModel(
     model: model,
     result: res,
     existingActivities: existingActivities,
@@ -117,13 +132,19 @@ Iterable<String> _getMissingStringLogs(OmniModel model, Iterable<String> fieldPa
 
 /// Sanitize an activity model.
 ///
-/// The function returns the sanitized model. The [definitions] param should be set to the definitions model and is used to check the existence of tags and metrics.
-/// The [existingActivities] should be a list of all the existing activities. The parameter is used to validate existing links to other activities.
-/// If provided, all te warnings and errors are appended to the [result] parameter.
-OmniModel sanitizeActivityModel({
+/// The folder must be located in the local file system and the [folder] param must be an absolute path to it.
+///
+/// - [existingActivities]: list of all the existing activities. Used to validate existing links to other activities.
+///
+/// - [definitions]: the model of the common definitions. Used to check categories, tags, metrics and more.
+///
+/// - [result]: if provided, append the result of the model sanitization to the result.
+///
+/// Returns the result of the sanitization.
+SanitizationResult sanitizeActivityModel({
   required OmniModel model,
-  OmniModel? definitions,
   List<OmniModel>? existingActivities,
+  OmniModel? definitions,
   SanitizationResult? result,
 }) {
   result ??= SanitizationResult(model.tokenOr("id", "uknown"));
@@ -302,7 +323,8 @@ OmniModel sanitizeActivityModel({
       }
     }
   }
-  return model;
+  result.sanitizedModel = model;
+  return result;
 }
 
 String _formatActivityString(String source) {
