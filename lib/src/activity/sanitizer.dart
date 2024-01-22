@@ -145,7 +145,7 @@ SanitizationResult sanitizeActivityModel({
   OmniModel? definitions,
   SanitizationResult? result,
 }) {
-  result ??= SanitizationResult(model.tokenOr("id", "uknown"));
+  result ??= SanitizationResult(model.tokenOr("name", "uknown"));
 
   var images = model.tokenAsModel("images").entries.toList();
   var points = model.tokenAsModel("location.points").entries.toList();
