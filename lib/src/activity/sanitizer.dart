@@ -12,8 +12,6 @@ class SanitizationResult {
     errors = List.empty(growable: true);
     warnings = List.empty(growable: true);
     sanitizedModel = OmniModel.empty();
-    maxFileSize = 0;
-    folderSize = 0;
   }
 
   bool get success => errors.isEmpty;
@@ -23,8 +21,8 @@ class SanitizationResult {
 
   late List<String> errors;
   late List<String> warnings;
-  late double maxFileSize;
-  late double folderSize;
+  double? maxFileSize;
+  double? folderSize;
 }
 
 /// Sanitize an activity folder.
@@ -87,7 +85,7 @@ Future<SanitizationResult> sanitizeActivityFolder(
     }
     for (final a in storageElems) {
       var size = File(a.path).statSync().size / 1024;
-      if (size > (res.maxFileSize)) {
+      if (size > (res.maxFileSize ?? 0)) {
         res.maxFileSize = size;
       }
       if (size > warningSizeKB) {
@@ -328,8 +326,8 @@ SanitizationResult sanitizeActivityModel({
 }
 
 String _formatActivityString(String source) {
-  var reg = RegExp(r"[ ]+\n[ ]+|\n[ ]+|[ ]+\n");
-  source = source.replaceAll(reg, "\n");
+  // TODO check
+  source = source.replaceAll(RegExp(r"[ ]+\n[ ]+|\n[ ]+|[ ]+\n"), r"\n");
   source = source.replaceAll(RegExp("[ ]{2,}"), " ");
   source = source.replaceAll("A'", "À");
   source = source.replaceAll("E'", "È");
